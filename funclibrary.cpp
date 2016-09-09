@@ -129,6 +129,14 @@ void getFiles( string path, vector<string>& files )  //»ñÈ¡ÎÄ¼þ¼ÐÏÂµÄËùÓÐÎÄ¼þ£»
 	}  
 }  
 
+string Cstring2string(Cstring cs)
+{
+	std::string strStl;
+
+    strStl=cs.GetBuffer(0);
+    return strStl;
+}
+
 void Bmp2IplImage(BYTE*Bmp, IplImage*cvPhoto)
 {
 	//	memcpy(cvPhoto->imageData,(char*)(Bmp),1920*1440*3); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
