@@ -137,6 +137,13 @@ string Cstring2string(Cstring cs)
     return strStl;
 }
 
+Cstring string2Cstring(string s)
+{
+	CString strMfc;
+	strMfc=s.c_str();
+	return strMfc;
+}
+
 void Bmp2IplImage(BYTE*Bmp, IplImage*cvPhoto)
 {
 	//	memcpy(cvPhoto->imageData,(char*)(Bmp),1920*1440*3); //�������õ���ͼ���ǵ�������
