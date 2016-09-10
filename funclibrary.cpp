@@ -2,18 +2,46 @@
 #include"funclibrary.h"
 #include "direct.h"
 
+CString GetFolderName()
+{
+	static TCHAR strDirName[MAX_PATH];
 
-CString  GetFilename( CString FileName)//获得文件名；
+	BROWSEINFO bi;
+	CString szString = TEXT("选择一个源文件子文件夹");
+	bi.hwndOwner = ::GetFocus();
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = strDirName;
+	bi.lpszTitle = szString;
+	bi.ulFlags = BIF_BROWSEFORCOMPUTER | BIF_DONTGOBELOWDOMAIN | BIF_RETURNONLYFSDIRS;
+	bi.lpfn = NULL;
+	bi.lParam = 0;
+	bi.iImage = 0;
+
+	LPITEMIDLIST pItemIDList = ::SHBrowseForFolder(&bi);
+	if(pItemIDList == NULL)
+	{
+		return ;
+	}
+
+	::SHGetPathFromIDList(pItemIDList, strDirName);
+
+	CString str = strDirName;
+	if(str != "" && str.Right(1) != '//')
+		str+= "\\";
+	return str;
+}
+ 
+CString  GetFilename( CString FileName)//èŽ·å¾—æ–‡ä»¶åï¼›
 {
 	CString Suffix = "0";
 	char* fileName = (LPSTR)(LPCTSTR)FileName;
 
 	char c = '.'; 
 	char d = '\\' ;
-	char *ptr1 = strrchr(fileName, c);    //最后一个出现c的位置
-	char *ptr2 = strrchr(fileName, d);    //最后一个出现d的位置
+	char *ptr1 = strrchr(fileName, c);    //æœ€åŽä¸€ä¸ªå‡ºçŽ°cçš„ä½ç½®
+	char *ptr2 = strrchr(fileName, d);    //æœ€åŽä¸€ä¸ªå‡ºçŽ°dçš„ä½ç½®
 
-	int  n = (ptr1 - ptr2 - 1) ; //后缀名长度；
+	int  n = (ptr1 - ptr2 - 1) ; //åŽç¼€åé•¿åº¦ï¼›
 	char stbuf[50] ={0};
 	strncpy_s(stbuf,  ptr2 + 1, n);
 	Suffix.Format(stbuf);
@@ -51,15 +79,15 @@ CString  GetModulePath()  //1
 }
 
 
-CString  GetFileSuffix( CString FileName)//2 获得文件后缀名；
+CString  GetFileSuffix( CString FileName)//2 èŽ·å¾—æ–‡ä»¶åŽç¼€åï¼›
 {
 	CString Suffix = "0";
 	char* fileName = (LPSTR)(LPCTSTR)FileName;
 
 	char c = '.';
-	char *ptr = strrchr(fileName, c);    //最后一个出现c的位��?
-	int  pos = ptr-fileName;             //用指针相��?求得c索引
-	int  n = strlen(fileName) - (pos + 1) ; //后缀名长度；
+	char *ptr = strrchr(fileName, c);    //æœ€åŽä¸€ä¸ªå‡ºçŽ°cçš„ä½ï¿½ï¿½?
+	int  pos = ptr-fileName;             //ç”¨æŒ‡é’ˆç›¸ï¿½ï¿½?æ±‚å¾—cç´¢å¼•
+	int  n = strlen(fileName) - (pos + 1) ; //åŽç¼€åé•¿åº¦ï¼›
 	char stbuf[20] ={0};
 	strncpy_s(stbuf,  ptr + 1, n);
 	Suffix.Format(stbuf);
@@ -82,13 +110,13 @@ CString  OpenFile()
 
 	return FileName;
 }
-/**************************************getFiles �÷�*********************************************************/ 
+/**************************************getFiles ÓÃ·¨*********************************************************/ 
 /*  vector<string> files;  
 
 	CString Path = GetModulePath();
 	Path = Path +"1";
 	string filePath = Path.GetBuffer(0);
-	////��ȡ��·���µ������ļ�  
+	////»ñÈ¡¸ÃÂ·¾¶ÏÂµÄËùÓÐÎÄ¼þ  
 	getFiles(filePath, files );  
 
 	vector<CString> cFiles; 
@@ -102,19 +130,19 @@ CString  OpenFile()
 	} 
 */
 /************************************************************************************************************/ 
-void getFiles( string path, vector<string>& files )  //��ȡ�ļ����µ������ļ��� 
+void getFiles( string path, vector<string>& files )  //»ñÈ¡ÎÄ¼þ¼ÐÏÂµÄËùÓÐÎÄ¼þ£» 
 {  
-	//�ļ����  
+	//ÎÄ¼þ¾ä±ú  
 	long   hFile   =   0;  
-	//�ļ���Ϣ  
+	//ÎÄ¼þÐÅÏ¢  
 	struct _finddata_t fileinfo;  
 	string p;  
 	if((hFile = _findfirst(p.assign(path).append("\\*").c_str(),&fileinfo)) !=  -1)  
 	{  
 		do  
 		{  
-			//�����Ŀ¼,����֮  
-			//�������,�����б�  
+			//Èç¹ûÊÇÄ¿Â¼,µü´úÖ®  
+			//Èç¹û²»ÊÇ,¼ÓÈëÁÐ±í  
 			if((fileinfo.attrib &  _A_SUBDIR))  
 			{  
 				if(strcmp(fileinfo.name,".") != 0  &&  strcmp(fileinfo.name,"..") != 0)  
@@ -146,17 +174,17 @@ Cstring string2Cstring(string s)
 
 void Bmp2IplImage(BYTE*Bmp, IplImage*cvPhoto)
 {
-	//	memcpy(cvPhoto->imageData,(char*)(Bmp),1920*1440*3); //�������õ���ͼ���ǵ�������
+	//	memcpy(cvPhoto->imageData,(char*)(Bmp),1920*1440*3); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for (int y = 0 ;y < cvPhoto->height; y++)
 	{
-		memcpy(cvPhoto->imageData+y*cvPhoto->widthStep, Bmp + 3*(cvPhoto->height - y - 1)*cvPhoto->width,3*cvPhoto->width);//��һ����ת��
+		memcpy(cvPhoto->imageData+y*cvPhoto->widthStep, Bmp + 3*(cvPhoto->height - y - 1)*cvPhoto->width,3*cvPhoto->width);//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 	}
 
 }	
 
-void MatchHist(IplImage* srcImg, IplImage* dstImg) //改变的是SRC
+void MatchHist(IplImage* srcImg, IplImage* dstImg) //æ”¹å˜çš„æ˜¯SRC
 {
-	// ****** 如果��?RGB 图片则转为灰度图片操��?******
+	// ****** å¦‚æžœï¿½ï¿½?RGB å›¾ç‰‡åˆ™è½¬ä¸ºç°åº¦å›¾ç‰‡æ“ï¿½ï¿½?******
 
 	int grayArr[256];
 	int srcRow = srcImg->height;
@@ -167,7 +195,7 @@ void MatchHist(IplImage* srcImg, IplImage* dstImg) //改变的是SRC
 	float dstCdfArr[256]  = {0.f};
 	float tmp;
 
-	// *** 求解源图片的累积直方图（概率）分��?***
+	// *** æ±‚è§£æºå›¾ç‰‡çš„ç´¯ç§¯ç›´æ–¹å›¾ï¼ˆæ¦‚çŽ‡ï¼‰åˆ†ï¿½ï¿½?***
 	memset(grayArr, 0, sizeof(grayArr));
 	for(size_t nrow = 0; nrow < srcRow; nrow++)
 	{
@@ -188,7 +216,7 @@ void MatchHist(IplImage* srcImg, IplImage* dstImg) //改变的是SRC
 		// std::cout<<srcCdfArr[i]<<std::endl;
 	}
 
-	// *** 求解目标图片的累积直方图（概率）分布 ***
+	// *** æ±‚è§£ç›®æ ‡å›¾ç‰‡çš„ç´¯ç§¯ç›´æ–¹å›¾ï¼ˆæ¦‚çŽ‡ï¼‰åˆ†å¸ƒ ***
 	memset(grayArr, 0, sizeof(grayArr));
 	for(size_t nrow = 0; nrow < dstRow; nrow++)
 	{
@@ -208,7 +236,7 @@ void MatchHist(IplImage* srcImg, IplImage* dstImg) //改变的是SRC
 		dstCdfArr[i] = tmp / (dstRow * dstCol);
 	}
 
-	// *** 直方图匹配算��?***
+	// *** ç›´æ–¹å›¾åŒ¹é…ç®—ï¿½ï¿½?***
 	int histMap[256];
 	int minTag;
 	for(int i=0; i<256; i++)
@@ -216,7 +244,7 @@ void MatchHist(IplImage* srcImg, IplImage* dstImg) //改变的是SRC
 		float minMap = 10.f;
 		for(int j=0; j<256; j++)
 		{
-			if (minMap > abs(srcCdfArr[i] - dstCdfArr[j])) //求最小值；
+			if (minMap > abs(srcCdfArr[i] - dstCdfArr[j])) //æ±‚æœ€å°å€¼ï¼›
 			{
 				minMap = abs(srcCdfArr[i] - dstCdfArr[j]);
 				minTag = j;
