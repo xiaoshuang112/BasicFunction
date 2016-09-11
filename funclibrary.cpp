@@ -2,6 +2,28 @@
 #include"funclibrary.h"
 #include "direct.h"
 
+void  WriteInidata(int*In, int StrAr, int length)
+{
+	CString   DataINI = GetModulePath() + "Inidata.ini"; // 设定参 数文档路径
+	FILE *File = NULL;
+	fopen_s(&File,DataINI , "w");
+	fclose(File);
+
+	CStdioFile MyFile(DataINI, CFile::modeWrite | CFile::typeText);
+
+	CString A ="";
+
+	for (int i = StrAr; i < length; i++)
+	{
+		A.Format("%d,%d\n",i, In[i]);
+
+		MyFile.WriteString(A);
+	}
+
+	ShellExecute(NULL,"open",DataINI,NULL,NULL,SW_SHOW);// 打开外部文件程序
+
+}
+
 CString GetFolderName()
 {
 	static TCHAR strDirName[MAX_PATH];
@@ -30,13 +52,13 @@ CString GetFolderName()
 		str+= "\\";
 	return str;
 }
- 
+
 CString  GetFilename( CString FileName)//èŽ·å¾—æ–‡ä»¶åï¼›
 {
 	CString Suffix = "0";
 	char* fileName = (LPSTR)(LPCTSTR)FileName;
 
-	char c = '.'; 
+	char c = '.';
 	char d = '\\' ;
 	char *ptr1 = strrchr(fileName, c);    //æœ€åŽä¸€ä¸ªå‡ºçŽ°cçš„ä½ç½®
 	char *ptr2 = strrchr(fileName, d);    //æœ€åŽä¸€ä¸ªå‡ºçŽ°dçš„ä½ç½®
@@ -110,52 +132,52 @@ CString  OpenFile()
 
 	return FileName;
 }
-/**************************************getFiles ÓÃ·¨*********************************************************/ 
-/*  vector<string> files;  
+/**************************************getFiles ÓÃ·¨*********************************************************/
+/*  vector<string> files;
 
 	CString Path = GetModulePath();
 	Path = Path +"1";
 	string filePath = Path.GetBuffer(0);
-	////»ñÈ¡¸ÃÂ·¾¶ÏÂµÄËùÓÐÎÄ¼þ  
-	getFiles(filePath, files );  
+	////»ñÈ¡¸ÃÂ·¾¶ÏÂµÄËùÓÐÎÄ¼þ
+	getFiles(filePath, files );
 
-	vector<CString> cFiles; 
-	
+	vector<CString> cFiles;
+
 	CString buffer;
-	int size = files.size();  
-	for (int i = 0;i < size;i++)  
-	{  
+	int size = files.size();
+	for (int i = 0;i < size;i++)
+	{
 		buffer = files[i].c_str();
 	 	cFiles.push_back(buffer);
-	} 
+	}
 */
-/************************************************************************************************************/ 
-void getFiles( string path, vector<string>& files )  //»ñÈ¡ÎÄ¼þ¼ÐÏÂµÄËùÓÐÎÄ¼þ£» 
-{  
-	//ÎÄ¼þ¾ä±ú  
-	long   hFile   =   0;  
-	//ÎÄ¼þÐÅÏ¢  
-	struct _finddata_t fileinfo;  
-	string p;  
-	if((hFile = _findfirst(p.assign(path).append("\\*").c_str(),&fileinfo)) !=  -1)  
-	{  
-		do  
-		{  
-			//Èç¹ûÊÇÄ¿Â¼,µü´úÖ®  
-			//Èç¹û²»ÊÇ,¼ÓÈëÁÐ±í  
-			if((fileinfo.attrib &  _A_SUBDIR))  
-			{  
-				if(strcmp(fileinfo.name,".") != 0  &&  strcmp(fileinfo.name,"..") != 0)  
-					getFiles( p.assign(path).append("\\").append(fileinfo.name), files );  
-			}  
-			else  
-			{  
-				files.push_back(p.assign(path).append("\\").append(fileinfo.name) );  
-			}  
-		}while(_findnext(hFile, &fileinfo)  == 0);  
-		_findclose(hFile);  
-	}  
-}  
+/************************************************************************************************************/
+void getFiles( string path, vector<string>& files )  //»ñÈ¡ÎÄ¼þ¼ÐÏÂµÄËùÓÐÎÄ¼þ£»
+{
+	//ÎÄ¼þ¾ä±ú
+	long   hFile   =   0;
+	//ÎÄ¼þÐÅÏ¢
+	struct _finddata_t fileinfo;
+	string p;
+	if((hFile = _findfirst(p.assign(path).append("\\*").c_str(),&fileinfo)) !=  -1)
+	{
+		do
+		{
+			//Èç¹ûÊÇÄ¿Â¼,µü´úÖ®
+			//Èç¹û²»ÊÇ,¼ÓÈëÁÐ±í
+			if((fileinfo.attrib &  _A_SUBDIR))
+			{
+				if(strcmp(fileinfo.name,".") != 0  &&  strcmp(fileinfo.name,"..") != 0)
+					getFiles( p.assign(path).append("\\").append(fileinfo.name), files );
+			}
+			else
+			{
+				files.push_back(p.assign(path).append("\\").append(fileinfo.name) );
+			}
+		}while(_findnext(hFile, &fileinfo)  == 0);
+		_findclose(hFile);
+	}
+}
 
 string Cstring2string(Cstring cs)
 {
@@ -165,7 +187,7 @@ string Cstring2string(Cstring cs)
     return strStl;
 }
 
-Cstring string2Cstring(string s)
+CString string2Cstring(string s)
 {
 	CString strMfc;
 	strMfc=s.c_str();
@@ -180,7 +202,7 @@ void Bmp2IplImage(BYTE*Bmp, IplImage*cvPhoto)
 		memcpy(cvPhoto->imageData+y*cvPhoto->widthStep, Bmp + 3*(cvPhoto->height - y - 1)*cvPhoto->width,3*cvPhoto->width);//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 	}
 
-}	
+}
 
 void MatchHist(IplImage* srcImg, IplImage* dstImg) //æ”¹å˜çš„æ˜¯SRC
 {
@@ -272,10 +294,10 @@ void   Savetestdata(CString name,int NO,int wide, int height)
 
 	FILE  *fp  = NULL;
 
-	
+
 	CString FileName = path +name + ".xls";
 	fp=freopen(FileName,"at",stdout);
-	if(fp==NULL)  
+	if(fp==NULL)
 	{
 		return;
 	}
@@ -293,5 +315,5 @@ void   Savetestdata(CString name,int NO,int wide, int height)
 	CString sdata;
 	sdata.Format("%d\t%d\t%d",NO,wide,height);
 	printf(sdata);
-	fclose(fp); 
+	fclose(fp);
 }
