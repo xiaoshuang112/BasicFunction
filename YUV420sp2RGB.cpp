@@ -1,3 +1,49 @@
+
+#define MIN(x,y,z) ((x)<(y)?(x):(y))<(z)?((x)<(y)?(x):(y)):(z)
+#define MAX(x,y,z) ((x)>(y)?(x):(y))>(z)?((x)>(y)?(x):(y)):(z)
+
+void RGBtoHSV(  OSAL_UCHAR b,OSAL_UCHAR g,OSAL_UCHAR r,  OSAL_PUCHAR h, OSAL_PUCHAR s, OSAL_PUCHAR v )
+{
+    double min, max;
+    double delta;
+
+	double rd = (double) r/255;
+	double gd = (double) g/255;
+	double bd = (double) b/255;
+
+    min = MIN( rd, gd, bd );
+    max = MAX( rd, gd, bd );
+	double H, S, V = max;
+    delta = max - min;
+
+	S = (max == 0 ? 0 : delta / max);
+
+    if( max == min )
+    {
+        H = 0; 
+    }
+	else
+	{
+		if (max == rd) 
+		{
+			H = (gd - bd) / delta + (gd < bd ? 6 : 0);
+		} 
+		else if (max == gd) 
+		{
+			H = (bd - rd) / delta + 2;
+		}
+		else if (max == bd) 
+		{
+			H = (rd - gd) / delta + 4;
+		}
+		H /= 6;
+	}
+
+	*h = (char)(180.0*H);
+	*s = (char)(S*255.0);
+	*v = (char)(V*255.0);
+}
+
 YUV420SP_to_RGB24(HI_U8 *yuv420sp[2], HI_U8 *rgb24)
 {
 
@@ -60,3 +106,5 @@ YUV420SP_to_RGB24(HI_U8 *yuv420sp[2], HI_U8 *rgb24)
 
     	return rgb24;
 }
+
+
