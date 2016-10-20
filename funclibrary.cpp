@@ -317,3 +317,36 @@ void   Savetestdata(CString name,int NO,int wide, int height)
 	printf(sdata);
 	fclose(fp);
 }
+
+static void  resize(OSAL_UCHAR* src,OSAL_INT32 iW_s,OSAL_INT32 iH_s,OSAL_UCHAR* dst,OSAL_INT32 iW_d,OSAL_INT32 iH_d)
+{
+
+	float xscale = (float)iW_s/(float)iW_d;
+	float yscale = (float)iH_s/(float)iH_d;
+	int x=0,y=0;
+
+	float X_s,Y_s,X_f,Y_f;
+	int P_x,P_y;
+	for(y = 0; y<iH_d ; y++)
+	{
+		OSAL_UCHAR*ptr = dst + y*iW_d;
+		for(x = 0; x<iW_d ; x++)
+		{
+			X_s = (float)x * xscale;
+			Y_s = (float)y * yscale;
+
+			P_x = (int)(X_s);
+			P_y = (int)(Y_s);
+
+			X_f = X_s - P_x;
+			Y_f = Y_s - P_y;
+
+			ptr[x] = (1.0 - X_f)*(1.0 - Y_f)*src[P_y*iW_s + P_x] + (X_f)*(1.0 - Y_f)*src[P_y*iW_s + P_x + 1] 
+			+ (1.0 - X_f)*(Y_f)*src[(P_y + 1)*iW_s + P_x] + (X_f)*(Y_f)*src[(P_y + 1)*iW_s + P_x + 1];
+		}
+	}
+
+
+	return  ;
+
+}
